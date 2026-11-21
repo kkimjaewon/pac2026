@@ -1,0 +1,10 @@
+# Shared FR3/UR5e scenario-4 simulation feasibility samples, not an approach trajectory.
+control_mode: position
+min_dof: 6
+preferred_period_ns: 1000000
+maximum_period_ns: 4000000  # explicit task permission for a 2/3/4ms latest-target backend
+sample_tcp_poses:
+  - [0.37, 0.00, 0.812, 1.0, 0.0, 0.0, 0.0]
+  - [0.33, 0.00, 0.812, 1.0, 0.0, 0.0, 0.0]
+  - [0.35, 0.02, 0.812, 1.0, 0.0, 0.0, 0.0]
+  - [0.35, 0.00, 0.812, 1.0, 0.0, 0.0, 0.0]

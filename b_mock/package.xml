@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>b_mock</name>
+  <version>0.1.0</version>
+  <description>B(실시간 제어) 대역 노드. C 계층 개발용으로 /hal/final_command를 1kHz로 발행한다.</description>
+  <maintainer email="zxcasd1211@hanyang.ac.kr">yeonju</maintainer>
+  <license>Apache-2.0</license>
+  <depend>rclpy</depend>
+  <depend>rcl_interfaces</depend>
+  <depend>intelion_interfaces</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

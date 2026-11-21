@@ -1,0 +1,160 @@
+# Gazebo-only execution profile. B-C v0.3 fields stay unchanged.
+# Origin-spawned no-tool simulation. TCP axes match official tool0, not flange axes.
+# Position limits from installed official descriptions. Velocity/acceleration are demo restrictions.
+# Workspace box is not a collision/reachability guarantee. Use a verified common task region.
+# State period 10ms is a conservative wall-clock demo assumption; measure for the target machine.
+contract_version: '0.3'
+robot:
+  joint_count: 6
+  id: ur_1
+  model: ur5e
+  adapter: ur5e
+  execution_backend: gazebo
+  robot_description_parameter: robot_description
+frames:
+  reference: map
+  base: base_link
+  flange: flange
+  tcp: ur_tcp
+  reference_to_base:
+    translation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    rotation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+  # Official URDF flange->tool0 fixed rotation RPY(pi/2,0,pi/2).
+  # The TCP +z tool direction now has the same task meaning as the FR3 TCP +z.
+  flange_to_tcp:
+    translation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    rotation:
+      x: 0.5
+      y: 0.5
+      z: 0.5
+      w: 0.5
+joints:
+- name: shoulder_pan_joint
+  device_index: 0
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -6.283185307179586
+  upper_rad: 6.283185307179586
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: shoulder_lift_joint
+  device_index: 1
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -6.283185307179586
+  upper_rad: 6.283185307179586
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: elbow_joint
+  device_index: 2
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -3.141592653589793
+  upper_rad: 3.141592653589793
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: wrist_1_joint
+  device_index: 3
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -6.283185307179586
+  upper_rad: 6.283185307179586
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: wrist_2_joint
+  device_index: 4
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -6.283185307179586
+  upper_rad: 6.283185307179586
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: wrist_3_joint
+  device_index: 5
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -6.283185307179586
+  upper_rad: 6.283185307179586
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+workspace:
+  min_m:
+  - -1.0
+  - -1.0
+  - 0.0
+  max_m:
+  - 1.0
+  - 1.0
+  - 1.5
+  max_tcp_speed_m_s: 0.1
+  max_tcp_acceleration_m_s2: 0.2
+timing:
+  command_period_ns: 1000000
+  command_ttl_ns: 5000000
+  state_period_ns: 10000000
+  state_stale_ns: 30000000
+  state_lost_ns: 100000000
+  receiver_watchdog_ns: 100000000
+  ik_budget_ns: 500000
+ik:
+  solver: kdl
+  max_iterations: 30
+  position_tolerance_m: 0.001
+  orientation_tolerance_rad: 0.01
+  seed: last_solution
+transport:
+  controller_manager: /controller_manager
+  controller_name: hal_position_controller
+  joint_command_topic: /hal_position_controller/commands
+  joint_state_topic: /joint_states
+  receiver_stop_strategy: decelerate_then_hold
+  receiver_status_topic: /hal_position_controller/status
+topics:
+  command: /hal/final_command
+  state: /hal/state
+  error: /hal/error
+qos:
+  command:
+    reliability: best_effort
+    durability: volatile
+    depth: 1
+  state:
+    reliability: best_effort
+    durability: volatile
+    depth: 1
+  error:
+    reliability: reliable
+    durability: volatile
+    depth: 32
+runtime:
+  active_session_id: 0
+  state_heartbeat_hz: 10.0
+logging:
+  run_id: unset
+  directory: ~/pac_logs
+  enabled: true
+
+# Verified position backend only; slower transport requires explicit task permission.
+execution:
+  backend_period_ns: 1000000
+  capabilities:
+    control_modes: [position]
+    state_feedback: true
+    independent_watchdog: true
+    stop_strategy: decelerate_then_hold
+  task:
+    control_mode: position
+    min_dof: 6
+    preferred_period_ns: 1000000
+    maximum_period_ns: 1000000
+    sample_tcp_poses: []  # measured initial pose is always checked; task samples can be supplied by launch

@@ -1,0 +1,6 @@
+<library path="pac_hal_watchdog">
+  <class name="pac_hal/WatchdogPositionController" type="pac_hal::WatchdogPositionController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>Simulation position receiver with sequence/expiry checks and decelerating watchdog.</description>
+  </class>
+</library>

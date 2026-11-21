@@ -1,0 +1,158 @@
+# HD Hyundai Robotics HA006B (official hdr_description @8512ee3, BSD-3) in the team world.
+# C accepts it through the generic_gazebo profile path (no C++ model code).
+# Floor mount at map x=-0.4 (placement study: 13/13 demo targets reachable, J5 margin
+# >=0.91 rad, no table/camera contact). Flange = official tool0 (z = approach axis;
+# the 'flange' link is rotated 90 deg and is not used). Position limits are official;
+# velocity/acceleration are the same slow demo limits as FR3/UR5e, not maker maxima.
+contract_version: '0.3'
+robot:
+  joint_count: 6
+  id: hdr_1
+  model: ha006b
+  adapter: generic_gazebo
+  execution_backend: gazebo
+  robot_description_parameter: robot_description
+frames:
+  reference: map
+  base: base_link
+  flange: tool0
+  tcp: ha006b_tcp
+  reference_to_base:
+    translation:
+      x: -0.4
+      y: 0.0
+      z: 0.0
+    rotation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+  flange_to_tcp:
+    translation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    rotation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+joints:
+- name: j1
+  device_index: 0
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -3.0
+  upper_rad: 3.0
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: j2
+  device_index: 1
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -1.36
+  upper_rad: 3.14
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: j3
+  device_index: 2
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -1.43
+  upper_rad: 3.14
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: j4
+  device_index: 3
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -3.14
+  upper_rad: 3.14
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: j5
+  device_index: 4
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -2.356
+  upper_rad: 2.356
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+- name: j6
+  device_index: 5
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -6.283
+  upper_rad: 6.283
+  max_velocity_rad_s: 0.5
+  max_acceleration_rad_s2: 1.0
+workspace:
+  min_m:
+  - -1.0
+  - -1.0
+  - 0.0
+  max_m:
+  - 1.0
+  - 1.0
+  - 1.5
+  max_tcp_speed_m_s: 0.1
+  max_tcp_acceleration_m_s2: 0.2
+timing:
+  command_period_ns: 1000000
+  command_ttl_ns: 5000000
+  state_period_ns: 10000000
+  state_stale_ns: 30000000
+  state_lost_ns: 100000000
+  receiver_watchdog_ns: 100000000
+  ik_budget_ns: 500000
+ik:
+  solver: kdl
+  max_iterations: 30
+  position_tolerance_m: 0.001
+  orientation_tolerance_rad: 0.01
+  seed: last_solution
+transport:
+  controller_manager: /controller_manager
+  controller_name: hal_position_controller
+  joint_command_topic: /hal_position_controller/commands
+  joint_state_topic: /joint_states
+  receiver_stop_strategy: decelerate_then_hold
+  receiver_status_topic: /hal_position_controller/status
+topics:
+  command: /hal/final_command
+  state: /hal/state
+  error: /hal/error
+qos:
+  command:
+    reliability: best_effort
+    durability: volatile
+    depth: 1
+  state:
+    reliability: best_effort
+    durability: volatile
+    depth: 1
+  error:
+    reliability: reliable
+    durability: volatile
+    depth: 32
+runtime:
+  active_session_id: 0
+  state_heartbeat_hz: 10.0
+logging:
+  run_id: unset
+  directory: ~/pac_logs
+  enabled: true
+execution:
+  backend_period_ns: 1000000
+  capabilities:
+    control_modes:
+    - position
+    state_feedback: true
+    independent_watchdog: true
+    stop_strategy: decelerate_then_hold
+  task:
+    control_mode: position
+    min_dof: 6
+    preferred_period_ns: 1000000
+    maximum_period_ns: 1000000
+    sample_tcp_poses: []

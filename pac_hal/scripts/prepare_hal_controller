@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+from pac_hal.prepare_controller import main
+if __name__ == '__main__':
+    main()

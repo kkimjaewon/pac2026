@@ -1,0 +1,115 @@
+# Team world (franka_world.sdf) obstacles, identical to fr3_team_scene.yaml,
+# plus the UR5e 0.3m pedestal (same mount as ur5e_workcell). UR self pairs: official SRDF.
+version: 1
+frame: map
+obstacle_margin_m: 0.005
+joint_step_rad: 0.002
+max_path_steps: 128
+boxes:
+- name: table
+  source_model: table
+  center:
+  - 0.65
+  - 0
+  - 0.35
+  size:
+  - 0.7
+  - 0.8
+  - 0.7
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+- name: plate_motion_envelope
+  source_model: steel_plate
+  center:
+  - 0.5
+  - 0
+  - 0.705
+  size:
+  - 0.4
+  - 0.3
+  - 0.01
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  motion_xy_radius_m: 0.05
+  allow_dynamic_model: true
+- name: camera
+  source_model: rgbd_camera
+  center:
+  - 0.5
+  - 0
+  - 1.5
+  size:
+  - 0.03
+  - 0.1
+  - 0.03
+  quaternion_xyzw:
+  - 0
+  - 0.7071080798594735
+  - 0
+  - 0.7071054825112363
+  geometry_source: visual
+- name: floor
+  source_model: ground_plane
+  center:
+  - 0
+  - 0
+  - -0.01
+  size:
+  - 10
+  - 10
+  - 0.02
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  geometry_type: plane
+- name: robot_pedestal
+  source_model: robot_pedestal
+  center:
+  - 0
+  - 0
+  - 0.15
+  size:
+  - 0.14
+  - 0.14
+  - 0.3
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+disabled_self_pairs:
+- - base_link
+  - base_link_inertia
+- - base_link_inertia
+  - shoulder_link
+- - tool0
+  - wrist_1_link
+- - tool0
+  - wrist_2_link
+- - tool0
+  - wrist_3_link
+- - forearm_link
+  - upper_arm_link
+- - forearm_link
+  - wrist_1_link
+- - shoulder_link
+  - upper_arm_link
+- - wrist_1_link
+  - wrist_2_link
+- - wrist_1_link
+  - wrist_3_link
+- - wrist_2_link
+  - wrist_3_link
+disabled_environment_pairs:
+- - base_link_inertia
+  - floor
+- - base_link_inertia
+  - robot_pedestal

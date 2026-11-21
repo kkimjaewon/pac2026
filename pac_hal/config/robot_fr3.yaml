@@ -1,0 +1,179 @@
+# FR3 C++ HAL 설정: 런치가 이 파일을 읽고 v0.3 검증 후 snapshot으로 고정한다.
+# 실행 중 joint 순서/좌표/세션이 바뀌면 동일 명령의 의미가 달라지므로 재시작이 필요하다.
+# Gazebo-only execution profile. B-C v0.3 fields stay unchanged.
+# Identity base/TCP transforms match default origin-spawned, no-tool demonstration only.
+# Position limits from installed official descriptions. Velocity/acceleration are demo restrictions.
+# Workspace box is not a collision/reachability guarantee. Use a verified common task region.
+# State period 10ms is a conservative wall-clock demo assumption; measure for the target machine.
+contract_version: '0.3'
+# Gazebo 전용 어댑터다. 실물 robot_ip/libfranka 연결은 이 설정으로 활성화하지 않는다.
+robot:
+  joint_count: 7
+  id: franka_1
+  model: fr3
+  adapter: franka_fr3
+  execution_backend: gazebo
+  robot_description_parameter: robot_description
+# ^map T_tcp = ^map T_base × ^base T_flange × ^flange T_tcp. quaternion 순서는 xyzw.
+frames:
+  reference: map
+  base: fr3_link0
+  flange: fr3_link8
+  tcp: fr3_tcp
+  reference_to_base:
+    translation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    rotation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+  flange_to_tcp:
+    translation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    rotation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+# 배열 순서는 공식 URDF의 7축 순서. 장치 순서는 device_index, q_device=direction*q+offset.
+joints:
+- name: fr3_joint1
+  device_index: 0
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -2.9007
+  upper_rad: 2.9007
+  max_velocity_rad_s: 0.5  # 제조사 최대가 아닌 느린 시뮬 시험 제한
+  max_acceleration_rad_s2: 1.0
+- name: fr3_joint2
+  device_index: 1
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -1.8361
+  upper_rad: 1.8361
+  max_velocity_rad_s: 0.5  # 제조사 최대가 아닌 느린 시뮬 시험 제한
+  max_acceleration_rad_s2: 1.0
+- name: fr3_joint3
+  device_index: 2
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -2.9007
+  upper_rad: 2.9007
+  max_velocity_rad_s: 0.5  # 제조사 최대가 아닌 느린 시뮬 시험 제한
+  max_acceleration_rad_s2: 1.0
+- name: fr3_joint4
+  device_index: 3
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -3.077
+  upper_rad: -0.1169
+  max_velocity_rad_s: 0.5  # 제조사 최대가 아닌 느린 시뮬 시험 제한
+  max_acceleration_rad_s2: 1.0
+- name: fr3_joint5
+  device_index: 4
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -2.8763
+  upper_rad: 2.8763
+  max_velocity_rad_s: 0.5  # 제조사 최대가 아닌 느린 시뮬 시험 제한
+  max_acceleration_rad_s2: 1.0
+- name: fr3_joint6
+  device_index: 5
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: 0.4398
+  upper_rad: 4.6216
+  max_velocity_rad_s: 0.5  # 제조사 최대가 아닌 느린 시뮬 시험 제한
+  max_acceleration_rad_s2: 1.0
+- name: fr3_joint7
+  device_index: 6
+  direction: 1.0
+  zero_offset_rad: 0.0
+  lower_rad: -3.0508
+  upper_rad: 3.0508
+  max_velocity_rad_s: 0.5  # 제조사 최대가 아닌 느린 시뮬 시험 제한
+  max_acceleration_rad_s2: 1.0
+# 빠른 목표 필터용 직육면체다. 이 안에 있다고 IK 가능/작업대 무충돌이 보장되지는 않는다.
+workspace:
+  min_m:
+  - -1.0
+  - -1.0
+  - 0.0
+  max_m:
+  - 1.0
+  - 1.0
+  - 1.5
+  max_tcp_speed_m_s: 0.1
+  max_tcp_acceleration_m_s2: 0.2
+# B 생성 시각에 5ms를 더한 TTL은 송신/수신에서 재검사한다. 아래 주기는 성능 측정값이 아니다.
+timing:
+  command_period_ns: 1000000
+  command_ttl_ns: 5000000
+  state_period_ns: 10000000  # wall-clock 예상 수신 10ms: 대상 PC에서 실측 필요
+  state_stale_ns: 30000000
+  state_lost_ns: 100000000
+  receiver_watchdog_ns: 100000000  # 무통신 판정; 5ms 목표 만료는 이보다 먼저 감속 시작
+  ik_budget_ns: 500000
+# 직전 해로 시작해 7축 중복 자유도의 자세 점프를 줄인다. 500us 초과 해는 버린다.
+ik:
+  solver: kdl
+  max_iterations: 30
+  position_tolerance_m: 0.001
+  orientation_tolerance_rad: 0.01
+  seed: last_solution
+# 수신단 C++ watchdog controller가 명령 만료 때 감속 hold한다. gateway 종료에도 독립 동작한다.
+transport:
+  controller_manager: /controller_manager
+  controller_name: hal_position_controller
+  joint_command_topic: /hal_position_controller/commands
+  joint_state_topic: /joint_states
+  receiver_stop_strategy: decelerate_then_hold
+  receiver_status_topic: /hal_position_controller/status
+# B는 아래 공통 메시지만 알면 된다. 내부 관절 토픽은 B에서 직접 발행하지 않는다.
+topics:
+  command: /hal/final_command
+  state: /hal/state
+  error: /hal/error
+# command/state는 오래된 큐를 처리하지 않도록 depth1. error는 발생/해제 이벤트를 reliable로 보낸다.
+qos:
+  command:
+    reliability: best_effort
+    durability: volatile
+    depth: 1
+  state:
+    reliability: best_effort
+    durability: volatile
+    depth: 1
+  error:
+    reliability: reliable
+    durability: volatile
+    depth: 32
+# 0은 운동 세션 미등록 값. launch session_id로 B와 같은 양수 값을 지정한다.
+runtime:
+  active_session_id: 0
+  state_heartbeat_hz: 10.0
+# A/B/C 실험 run_id를 맞춘다. 기존 hal.csv를 덮어쓰지 않아 서로 다른 실험이 섞이지 않는다.
+logging:
+  run_id: unset
+  directory: ~/pac_logs
+  enabled: true
+
+# Verified position backend only; slower transport requires explicit task permission.
+execution:
+  backend_period_ns: 1000000
+  capabilities:
+    control_modes: [position]
+    state_feedback: true
+    independent_watchdog: true
+    stop_strategy: decelerate_then_hold
+  task:
+    control_mode: position
+    min_dof: 6
+    preferred_period_ns: 1000000
+    maximum_period_ns: 1000000
+    sample_tcp_poses: []  # measured initial pose is always checked; task samples can be supplied by launch

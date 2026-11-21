@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+"""Warm a persistent Gazebo pose service before C accepts robot commands."""
+import argparse
+import json
+import math
+import time
+import sys
+from rclpy.utilities import remove_ros_args
+import rclpy
+from rclpy.qos import QoSProfile, ReliabilityPolicy
+from sensor_msgs.msg import JointState
+from ros_gz_interfaces.srv import SetEntityPose
+from ros_gz_interfaces.msg import Entity
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--service', required=True)
+    parser.add_argument('--entity', required=True)
+    parser.add_argument('--pose-rpy', required=True)
+    parser.add_argument('--joint-names', default=json.dumps([f'fr3_joint{i}' for i in range(1, 8)]))
+    args = parser.parse_args(remove_ros_args(sys.argv)[1:])
+    expected = json.loads(args.joint_names)
+    if not expected or len(set(expected)) != len(expected):
+        raise ValueError('unique expected joint names required')
+    values = [float(v) for v in args.pose_rpy.split()]
+    if len(values) != 6 or not all(math.isfinite(v) for v in values):
+        raise ValueError('finite original SDF xyz/rpy required')
+    x, y, z, roll, pitch, yaw = values
+    rclpy.init()
+    node = rclpy.create_node('prepare_workcell_service')
+    client = node.create_client(SetEntityPose, args.service)
+    last_sample = 0.
+    steady_since = 0.
+
+    def joints(message):
+        nonlocal last_sample, steady_since
+        if not all(name in message.name for name in expected) or not all(math.isfinite(v) for v in message.position):
+            return
+        now = time.monotonic()
+        if not last_sample or now - last_sample > .02:
+            steady_since = now
+        last_sample = now
+
+    subscription = node.create_subscription(JointState, '/joint_states', joints,
+        QoSProfile(depth=1, reliability=ReliabilityPolicy.BEST_EFFORT))
+    try:
+        if not client.wait_for_service(timeout_sec=30):
+            raise RuntimeError('persistent Gazebo pose service missing')
+        request = SetEntityPose.Request()
+        request.entity.name = args.entity
+        request.entity.type = Entity.MODEL
+        request.pose.position.x = x
+        request.pose.position.y = y
+        request.pose.position.z = z
+        cr, sr = math.cos(roll/2), math.sin(roll/2)
+        cp, sp = math.cos(pitch/2), math.sin(pitch/2)
+        cy, sy = math.cos(yaw/2), math.sin(yaw/2)
+        request.pose.orientation.x = sr*cp*cy - cr*sp*sy
+        request.pose.orientation.y = cr*sp*cy + sr*cp*sy
+        request.pose.orientation.z = cr*cp*sy - sr*sp*cy
+        request.pose.orientation.w = cr*cp*cy + sr*sp*sy
+        # 원래 모델 pose를 재설정한다. 철판/로봇을 다른 위치로 이동시키지 않는다.
+        future = client.call_async(request)
+        deadline = time.monotonic() + 10
+        while not future.done() and time.monotonic() < deadline:
+            rclpy.spin_once(node, timeout_sec=.005)
+        if not future.done() or not future.result().success:
+            raise RuntimeError('Gazebo pose service warmup failed')
+        # cold request의 상태 공백이 끝난 뒤 신선한 joint stream 0.3초를 확인한다.
+        steady_since = time.monotonic()
+        deadline = steady_since + 10
+        while time.monotonic() < deadline:
+            rclpy.spin_once(node, timeout_sec=.005)
+            now = time.monotonic()
+            if last_sample and now - last_sample < .02 and now - steady_since >= .3:
+                node.get_logger().info('pose service warm; joint stream fresh; C may start')
+                return 0
+        raise RuntimeError('fresh joint stream did not settle after warmup')
+    except Exception as exc:
+        node.get_logger().error(str(exc))
+        return 1
+    finally:
+        node.destroy_subscription(subscription)
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
