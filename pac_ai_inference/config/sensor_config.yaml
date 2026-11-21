@@ -1,0 +1,41 @@
+# A 계층(ai_inference_node) 공통 파라미터.
+# detector_mode / primary_impl / color_v_min 은 launch 인자가 우선하므로 여기에 두지 않는다.
+ai_inference_node:
+  ros__parameters:
+    # 센서·좌표
+    map_frame: map
+    camera_frame: depth_camera_link
+    frame_timeout_s: 0.2
+    # 철판 검출(깊이 기반 V)
+    table_depth_m: 0.0
+    min_height_m: 0.004
+    max_height_m: 0.02   # 철판 윗면(작업대 위 1cm)만. 작업대 위 약 11cm의 로봇은 제외
+    min_pixels: 200
+    edge_fit: true          # 가림 보정(철판 크기로 중심 계산). 문제 시 false
+    plate_size_u_m: 0.20    # 이미지 u방향 철판 크기 (= map y)
+    plate_size_v_m: 0.30    # 이미지 v방향 철판 크기 (= map x)
+    pos_from_v: true        # P·V 일치 시 위치는 V에서. 문제 시 false(기존: P에서)
+    # 명령 출력
+    command_type: position
+    smooth_n: 3
+    jump_limit_m: 0.05
+    jump_accept_after: 5
+    # P/V 자동 전환
+    agree_tol_m: 0.02
+    slow_ms: 50.0
+    switch_n: 3
+    recover_m: 15
+    min_hold_s: 1.0
+    # 색 검출기(P)
+    color_chroma_max: 15
+    color_min_pixels: 200
+    plate_aspect_min: 1.2
+    plate_aspect_max: 1.9
+    # 장애 주입(기본은 꺼짐)
+    fault_mode: none
+    fault_delay_ms: 200
+    det_fault_mode: none
+    det_fault_p_delay_ms: 80.0
+    det_fault_p_bad_offset_m: 0.1
+    # 로그
+    log_dir: ~/pac_logs
