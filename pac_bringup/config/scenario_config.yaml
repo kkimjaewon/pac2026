@@ -1,0 +1,18 @@
+# Shared FR3 simulation contract. Geometry/TF come from the canonical SDF.
+version: 1
+robot: franka_fr3
+world_file: franka_world.sdf
+map_frame: map
+camera_frame: depth_camera_link
+planned_position: [0.5, 0.0, 0.71]  # raw plate surface, before B offset
+ai_ttl_ns: 200000000
+confidence_min: 0.5
+accept_radius_m: 0.05
+target_offset: [0.0, 0.0, 0.10]  # simulation proposal, not a physical welding distance
+command_ttl_ns: 5000000
+# Functional integration settings, not evidence of real-time performance.
+v_max_m_s: 0.001
+a_max_m_s2: 0.002
+detector_mode: auto
+primary_impl: color
+color_v_min: 170

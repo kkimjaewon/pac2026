@@ -1,0 +1,181 @@
+# 제안 FR3 셀 전용. 철판 중심 XY±5cm, z=0.705 고정.
+# 세계/도구/설치 변경 시 장면도 갱신하고 재검증한다.
+# self 제외 쌍은 공식 hand=false SRDF, floor/link0는 베이스 장착 접촉이다.
+version: 1
+frame: map
+obstacle_margin_m: 0.005
+joint_step_rad: 0.002
+max_path_steps: 128
+boxes:
+- name: tabletop
+  center:
+  - 0.6
+  - 0
+  - 0.68
+  size:
+  - 0.9
+  - 0.8
+  - 0.04
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  source_model: table
+- name: plate_motion_envelope
+  center:
+  - 0.35
+  - 0
+  - 0.705
+  size:
+  - 0.4
+  - 0.3
+  - 0.01
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  source_model: steel_plate
+  motion_xy_radius_m: 0.05
+- name: camera
+  center:
+  - 0.35
+  - -0.6
+  - 1.5
+  size:
+  - 0.03
+  - 0.1
+  - 0.03
+  quaternion_xyzw:
+  - -0.31431367828262247
+  - 0.3143136782826225
+  - 0.6334089608179284
+  - 0.6334089608179285
+  source_model: rgbd_camera
+- name: leg_0.19_-0.36
+  center:
+  - 0.19
+  - -0.36
+  - 0.33
+  size:
+  - 0.06
+  - 0.06
+  - 0.66
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  source_model: table_leg_0_0
+- name: leg_0.19_0.36
+  center:
+  - 0.19
+  - 0.36
+  - 0.33
+  size:
+  - 0.06
+  - 0.06
+  - 0.66
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  source_model: table_leg_0_1
+- name: leg_1.01_-0.36
+  center:
+  - 1.01
+  - -0.36
+  - 0.33
+  size:
+  - 0.06
+  - 0.06
+  - 0.66
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  source_model: table_leg_1_0
+- name: leg_1.01_0.36
+  center:
+  - 1.01
+  - 0.36
+  - 0.33
+  size:
+  - 0.06
+  - 0.06
+  - 0.66
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  source_model: table_leg_1_1
+- name: floor
+  source_model: ground_plane
+  center:
+  - 0
+  - 0
+  - -0.01
+  size:
+  - 10
+  - 10
+  - 0.02
+  quaternion_xyzw:
+  - 0
+  - 0
+  - 0
+  - 1
+  geometry_type: plane
+disabled_self_pairs:
+- - fr3_link0
+  - fr3_link1
+- - fr3_link0
+  - fr3_link2
+- - fr3_link0
+  - fr3_link3
+- - fr3_link0
+  - fr3_link4
+- - fr3_link1
+  - fr3_link2
+- - fr3_link1
+  - fr3_link3
+- - fr3_link1
+  - fr3_link4
+- - fr3_link2
+  - fr3_link3
+- - fr3_link2
+  - fr3_link4
+- - fr3_link2
+  - fr3_link6
+- - fr3_link3
+  - fr3_link4
+- - fr3_link3
+  - fr3_link5
+- - fr3_link3
+  - fr3_link6
+- - fr3_link3
+  - fr3_link7
+- - fr3_link4
+  - fr3_link5
+- - fr3_link4
+  - fr3_link6
+- - fr3_link4
+  - fr3_link7
+- - fr3_link4
+  - fr3_link8
+- - fr3_link5
+  - fr3_link6
+- - fr3_link5
+  - fr3_link7
+- - fr3_link6
+  - fr3_link7
+- - fr3_link6
+  - fr3_link8
+- - fr3_link7
+  - fr3_link8
+disabled_environment_pairs:
+- - fr3_link0
+  - floor

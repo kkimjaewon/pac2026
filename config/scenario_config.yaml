@@ -1,0 +1,18 @@
+# A(AI 추론)와 B(실시간 제어)가 같이 읽는 시나리오 설정 (값은 회의 후 확정)
+scenario_id: 1            # 1: 위치 보정, 3: 공정 상태 판정
+
+frame_id: TBD             # 공통 작업 좌표계 이름 (map / workpiece 중 결정)
+
+scenario_1:
+  planned_position: [0.0, 0.0, 0.0]   # m
+  tolerance: 0.05                     # m (±5cm)
+
+scenario_3:
+  path_start: [0.0, 0.0, 0.0]         # m
+  path_end:   [0.0, 0.0, 0.0]         # m
+  speed: 0.0                          # m/s
+  tolerance: 0.010                    # m (±10mm)
+
+validation:
+  ai_ttl_ms: TBD          # 200 vs 40~60 논의 중
+  confidence_min: TBD     # 0.5 vs 0.7 논의 중

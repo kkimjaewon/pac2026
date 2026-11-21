@@ -1,0 +1,19 @@
+{
+  "wrong_session_waits_without_commands": true,
+  "no_ai_start_hold_error_m": 0.0,
+  "session_and_ttl": true,
+  "measured_z_move_m": 0.0020000541676925554,
+  "ai_to_real_b_to_c": true,
+  "ai_loss_hold_observed": true,
+  "version_fault_observed": true,
+  "fault_reset_success": true,
+  "fault_reset_message": "FAULT 해제 요청을 보냄 (결과는 B 로그의 [모드] 줄 확인)",
+  "recovery_keeps_registered_session": true,
+  "b_stop_receiver_watchdog": true,
+  "b_restart_sequence_continuity": true,
+  "passed": true,
+  "c_active_error_events": 0,
+  "maximum_logged_jitter_us": 1052.4,
+  "b_unit_tests_passed": 86,
+  "source_b_commit": "e5f2b91"
+}

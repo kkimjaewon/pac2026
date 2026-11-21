@@ -1,0 +1,28 @@
+# Local FR3 Gazebo integration profile. Keep the original team's rt_config.yaml.
+# C and B must share session_id; restarting a run requires restarting both.
+rt_control_node:
+  ros__parameters:
+    session_id: 42
+    require_registered_state: true  # Do not fall back to an unmeasured start.
+    start_fallback_on_timeout: false  # Wait in INIT instead of starting at start_position.
+    measured_orientation: true     # Hold the fresh initial C TCP orientation.
+    use_sim_time: true             # Header stamps use Gazebo; TTL stays monotonic.
+    fifo: true                   # Development PC, no RT performance claim.
+    cpu: 6
+    mlock: true
+    bridge_cpu: -1
+    ttl_ns: 200000000
+    confidence_min: 0.5
+    expected_layout_version: 1
+    expected_command_type: 0
+    planned_position: [0.5, 0.0, 0.71]
+    accept_radius: 0.05
+    blend_mode: single
+    target_offset: [-0.15, 0.0, 0.10]
+    v_max: 0.02
+    blend_deadband: 0.003
+    a_max: 0.05
+    require_c_state: true
+    c_state_timeout_ms: 30.0
+    hal_ttl_ns: 5000000
+    trace_enable: true

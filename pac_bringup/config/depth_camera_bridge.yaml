@@ -1,0 +1,20 @@
+# A 월드 depth_camera(rgbd_camera) → ROS 2 계약 토픽 브리지
+# run_env.sh의 parameter_bridge + 리매핑과 같은 결과.
+# QoS는 기본값(Reliable, depth 10)을 그대로 사용.
+- ros_topic_name: "/depth_camera/image_raw"
+  gz_topic_name: "/depth_camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/depth_camera/depth/image_raw"
+  gz_topic_name: "/depth_camera/depth_image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/depth_camera/camera_info"
+  gz_topic_name: "/depth_camera/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS

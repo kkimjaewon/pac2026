@@ -1,0 +1,33 @@
+# Local FR3 Gazebo integration profile. Keep the original team's rt_config.yaml.
+# C and B must share session_id; restarting a run requires restarting both.
+rt_control_node:
+  ros__parameters:
+    session_id: 42
+    require_registered_state: true  # Do not fall back to an unmeasured start.
+    start_fallback_on_timeout: false  # Wait in INIT instead of starting at start_position.
+    measured_orientation: true     # Hold the fresh initial C TCP orientation.
+    use_sim_time: true             # Header stamps use Gazebo; TTL stays monotonic.
+    fifo: false                   # Development PC, no RT performance claim.
+    cpu: -1
+    mlock: false
+    bridge_cpu: -1
+    ttl_ns: 200000000
+    confidence_min: 0.5
+    expected_layout_version: 1
+    expected_command_type: 0
+    planned_position: [0.3069, 0.0, 0.5903] # Example FR3 start; set to your task frame target.
+    accept_radius: 0.05
+    blend_mode: single
+    target_offset: [0.0, 0.0, 0.10] # 철판 표면 위 작업 높이. 임시값, 팀 합의(C의 IK 확인) 후 확정
+    blend_deadband: 0.0005         # 목표 불감대 [m] = 0.5mm. 목표가 이보다 적게 움직일 AI 명령은 무시 (0 = 끔)
+    v_max: 0.001                   # Conservative first integration: 1mm/s.
+    a_max: 0.002
+    j_max: 1.0                     # 저크 한계 [m/s³]. 가속도가 1ms에 1mm/s² 이하로만 바뀜 (S자 출발·정지, full_test_05). 0 = 끔
+    arrive_tol: 0.002              # 도착 판정: |blend 목표 - 측정 TCP| 허용 오차 [m] = 2mm (C와 합의)
+    arrive_hold_s: 0.3             # 도착 판정: 허용 오차 안에 이만큼 이상 머물면 도착 [s] (C와 합의)
+    resume_from_last_cmd: true     # 재개 시 마지막 발행 위치가 측정 TCP와 resume_match_tol 안이면 거기서 시작 (C 답 대기)
+    resume_match_tol: 0.002        # 재개 기준 허용 오차 [m] = 2mm
+    require_c_state: true
+    c_state_timeout_ms: 30.0
+    hal_ttl_ns: 5000000
+    trace_enable: true
